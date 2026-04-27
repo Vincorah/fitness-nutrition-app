@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - NutriFit</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <i class="fas fa-heartbeat"></i>
+                <span>NutriFit</span>
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                <li><a href="health.html" class="nav-link">Health</a></li>
+                <li><a href="recommendations.html" class="nav-link">Recommendations</a></li>
+                <li><a href="content.html" class="nav-link">Content</a></li>
+                <li><a href="profile.html" class="nav-link">Profile</a></li>
+                <li><a href="admin.html" class="nav-link active">Admin</a></li>
+            </ul>
+            <div class="nav-user">
+                <span id="userName"></span>
+                <button class="btn btn-outline" onclick="logout()">Logout</button>
+            </div>
+            <button class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Admin Page -->
+    <div class="dashboard container">
+        <div class="dashboard-header">
+            <h1><i class="fas fa-cog"></i> Admin Panel</h1>
+            <p>Manage users, content, and system settings</p>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <!-- Dashboard Stats -->
+        <div class="dashboard-grid" id="statsGrid">
+            <div class="dashboard-card">
+                <h3><i class="fas fa-users"></i> Total Users</h3>
+                <div class="value" id="statTotalUsers">--</div>
+            </div>
+            <div class="dashboard-card">
+                <h3><i class="fas fa-user-check"></i> Active Users</h3>
+                <div class="value" id="statActiveUsers">--</div>
+            </div>
+            <div class="dashboard-card">
+                <h3><i class="fas fa-dumbbell"></i> Exercises</h3>
+                <div class="value" id="statExercises">--</div>
+            </div>
+            <div class="dashboard-card">
+                <h3><i class="fas fa-apple-alt"></i> Foods</h3>
+                <div class="value" id="statFoods">--</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('users')">
+                <i class="fas fa-users"></i> Users
+            </button>
+            <button class="tab" onclick="switchTab('exercises')">
+                <i class="fas fa-dumbbell"></i> Exercises
+            </button>
+            <button class="tab" onclick="switchTab('foods')">
+                <i class="fas fa-apple-alt"></i> Foods
+            </button>
+            <button class="tab" onclick="switchTab('stats')">
+                <i class="fas fa-chart-bar"></i> Statistics
+            </button>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="usersTab" class="tab-content active">
+            <div class="card">
+                <div class="card-header">
+                    <h3>User Management</h3>
+                    <input type="text" id="userSearch" placeholder="Search users..." onkeyup="debounce(loadUsers, 300)()">
+                </div>
+                <div class="card-body">
+                    <div id="usersContainer">
+                        <div class="text-center">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                    <div id="usersPagination"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exercises Tab -->
+        <div id="exercisesTab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Exercise Management</h3>
+                    <button class="btn btn-primary" onclick="showExerciseModal()">
+                        <i class="fas fa-plus"></i> Add Exercise
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="adminExercisesContainer">
+                        <div class="text-center">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                    <div id="adminExercisesPagination"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Foods Tab -->
+        <div id="foodsTab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Food Management</h3>
+                    <button class="btn btn-primary" onclick="showFoodModal()">
+                        <i class="fas fa-plus"></i> Add Food
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="adminFoodsContainer">
+                        <div class="text-center">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                    <div id="adminFoodsPagination"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Tab -->
+        <div id="statsTab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3>System Statistics</h3>
+                </div>
+                <div class="card-body" id="systemStatsContainer">
+                    <div class="text-center">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exercise Modal -->
+    <div class="modal-overlay" id="exerciseModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="exerciseModalTitle">Add Exercise</h3>
+                <button class="modal-close" onclick="closeModal('exerciseModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="exerciseForm">
+                    <input type="hidden" id="exerciseId">
+                    <div class="form-group">
+                        <label for="exName">Name *</label>
+                        <input type="text" id="exName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="exDescription">Description</label>
+                        <textarea id="exDescription" rows="2"></textarea>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label for="exCategory">Category *</label>
+                            <select id="exCategory" required>
+                                <option value="">Select...</option>
+                                <option value="cardio">Cardio</option>
+                                <option value="strength">Strength</option>
+                                <option value="flexibility">Flexibility</option>
+                                <option value="balance">Balance</option>
+                                <option value="hiit">HIIT</option>
+                                <option value="sports">Sports</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="exDifficulty">Difficulty *</label>
+                            <select id="exDifficulty" required>
+                                <option value="">Select...</option>
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="advanced">Advanced</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label for="exDuration">Duration (minutes)</label>
+                            <input type="number" id="exDuration" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="exCalories">Calories/Hour</label>
+                            <input type="number" id="exCalories" min="0">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="exInstructions">Instructions</label>
+                        <textarea id="exInstructions" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('exerciseModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveExercise()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Food Modal -->
+    <div class="modal-overlay" id="foodModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="foodModalTitle">Add Food</h3>
+                <button class="modal-close" onclick="closeModal('foodModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="foodForm">
+                    <input type="hidden" id="foodId">
+                    <div class="form-group">
+                        <label for="foodName">Name *</label>
+                        <input type="text" id="foodName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="foodDescription">Description</label>
+                        <textarea id="foodDescription" rows="2"></textarea>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label for="foodCategory">Category *</label>
+                            <select id="foodCategory" required>
+                                <option value="">Select...</option>
+                                <option value="protein">Protein</option>
+                                <option value="carbohydrate">Carbohydrate</option>
+                                <option value="fat">Fat</option>
+                                <option value="vegetable">Vegetable</option>
+                                <option value="fruit">Fruit</option>
+                                <option value="dairy">Dairy</option>
+                                <option value="grain">Grain</option>
+                                <option value="snack">Snack</option>
+                                <option value="beverage">Beverage</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="foodMealType">Meal Type</label>
+                            <select id="foodMealType">
+                                <option value="any">Any</option>
+                                <option value="breakfast">Breakfast</option>
+                                <option value="lunch">Lunch</option>
+                                <option value="dinner">Dinner</option>
+                                <option value="snack">Snack</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                        <div class="form-group">
+                            <label for="foodCalories">Calories/100g</label>
+                            <input type="number" id="foodCalories" step="0.1" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="foodProtein">Protein/100g</label>
+                            <input type="number" id="foodProtein" step="0.1" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="foodCarbs">Carbs/100g</label>
+                            <input type="number" id="foodCarbs" step="0.1" min="0">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label for="foodFat">Fat/100g</label>
+                            <input type="number" id="foodFat" step="0.1" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="foodFiber">Fiber/100g</label>
+                            <input type="number" id="foodFiber" step="0.1" min="0">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('foodModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveFood()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer" style="margin-top: 50px;">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 NutriFit. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        // Check authentication and admin role
+        if (!requireAuth() || !requireAdmin()) {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Mobile navigation
+        document.getElementById('navToggle').addEventListener('click', () => {
+            document.getElementById('navMenu').classList.toggle('active');
+        });
+
+        // Set user name
+        const user = getCurrentUser();
+        document.getElementById('userName').textContent = `${user.firstName || ''} ${user.lastName || ''}`;
+
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tab + 'Tab').classList.add('active');
+
+            if (tab === 'users') loadUsers();
+            if (tab === 'exercises') loadAdminExercises();
+            if (tab === 'foods') loadAdminFoods();
+            if (tab === 'stats') loadSystemStats();
+        }
+
+        // Load dashboard stats
+        async function loadDashboardStats() {
+            try {
+                const result = await apiRequest('/admin/dashboard-stats');
+                const stats = result.data;
+
+                document.getElementById('statTotalUsers').textContent = stats.users.total;
+                document.getElementById('statActiveUsers').textContent = stats.users.active;
+                document.getElementById('statExercises').textContent = stats.content.exercises;
+                document.getElementById('statFoods').textContent = stats.content.foods;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Load users
+        async function loadUsers(page = 1) {
+            const container = document.getElementById('usersContainer');
+            
+            if (page === 1) {
+                container.innerHTML = '<div class="text-center"><div class="spinner"></div></div>';
+            }
+
+            const search = document.getElementById('userSearch').value;
+            let url = `/users/all?page=${page}&limit=10`;
+            if (search) url += `&search=${encodeURIComponent(search)}`;
+
+            try {
+                const result = await apiRequest(url);
+
+                if (result.data.users.length === 0) {
+                    container.innerHTML = '<p class="text-center">No users found.</p>';
+                    return;
+                }
+
+                let html = `
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                result.data.users.forEach(u => {
+                    html += `
+                        <tr>
+                            <td>${u.firstName} ${u.lastName}</td>
+                            <td>${u.email}</td>
+                            <td><span class="badge badge-${u.role === 'admin' ? 'danger' : 'primary'}">${u.role}</span></td>
+                            <td><span class="badge badge-${u.isActive ? 'success' : 'warning'}">${u.isActive ? 'Active' : 'Inactive'}</span></td>
+                            <td>${formatDate(u.createdAt)}</td>
+                            <td class="actions">
+                                <button class="btn btn-sm btn-outline" onclick="toggleUserRole(${u.id}, '${u.role}')">
+                                    <i class="fas fa-user-shield"></i>
+                                </button>
+                                <button class="btn btn-sm btn-${u.isActive ? 'warning' : 'success'}" onclick="toggleUserStatus(${u.id}, ${u.isActive})">
+                                    <i class="fas fa-${u.isActive ? 'ban' : 'check'}"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table></div>';
+                container.innerHTML = html;
+
+                // Pagination
+                if (result.data.pagination.totalPages > 1) {
+                    document.getElementById('usersPagination').innerHTML = '';
+                    document.getElementById('usersPagination').appendChild(
+                        createPagination(result.data.pagination.page, result.data.pagination.totalPages, loadUsers)
+                    );
+                }
+
+            } catch (error) {
+                container.innerHTML = `<p class="text-center text-error">Failed to load users: ${error.message}</p>`;
+            }
+        }
+
+        // Toggle user role
+        async function toggleUserRole(id, currentRole) {
+            const newRole = currentRole === 'admin' ? 'user' : 'admin';
+            if (!confirm(`Change user role to ${newRole}?`)) return;
+
+            try {
+                await apiRequest(`/admin/users/${id}/role`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ role: newRole })
+                });
+                showAlert('Role updated successfully', 'success');
+                loadUsers();
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        // Toggle user status
+        async function toggleUserStatus(id, isActive) {
+            const newStatus = !isActive;
+            const action = newStatus ? 'activate' : 'deactivate';
+            if (!confirm(`Are you sure you want to ${action} this user?`)) return;
+
+            try {
+                await apiRequest(`/admin/users/${id}/status`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ isActive: newStatus })
+                });
+                showAlert(`User ${action}d successfully`, 'success');
+                loadUsers();
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        // Load admin exercises
+        async function loadAdminExercises(page = 1) {
+            const container = document.getElementById('adminExercisesContainer');
+            container.innerHTML = '<div class="text-center"><div class="spinner"></div></div>';
+
+            try {
+                const result = await apiRequest(`/content/exercises?page=${page}&limit=10`);
+
+                let html = `
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Difficulty</th>
+                                    <th>Duration</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                result.data.exercises.forEach(ex => {
+                    html += `
+                        <tr>
+                            <td>${ex.name}</td>
+                            <td>${ex.category}</td>
+                            <td><span class="badge badge-${ex.difficultyLevel === 'beginner' ? 'success' : ex.difficultyLevel === 'intermediate' ? 'warning' : 'danger'}">${ex.difficultyLevel}</span></td>
+                            <td>${ex.durationMinutes || '--'} min</td>
+                            <td class="actions">
+                                <button class="btn btn-sm btn-outline" onclick="editExercise(${ex.id})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteExercise(${ex.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table></div>';
+                container.innerHTML = html;
+
+            } catch (error) {
+                container.innerHTML = `<p class="text-center text-error">Failed to load exercises: ${error.message}</p>`;
+            }
+        }
+
+        // Show exercise modal
+        function showExerciseModal(exercise = null) {
+            document.getElementById('exerciseModalTitle').textContent = exercise ? 'Edit Exercise' : 'Add Exercise';
+            document.getElementById('exerciseId').value = exercise ? exercise.id : '';
+            document.getElementById('exName').value = exercise ? exercise.name : '';
+            document.getElementById('exDescription').value = exercise ? exercise.description : '';
+            document.getElementById('exCategory').value = exercise ? exercise.category : '';
+            document.getElementById('exDifficulty').value = exercise ? exercise.difficultyLevel : '';
+            document.getElementById('exDuration').value = exercise ? exercise.durationMinutes : '';
+            document.getElementById('exCalories').value = exercise ? exercise.caloriesBurnedPerHour : '';
+            document.getElementById('exInstructions').value = exercise ? exercise.instructions : '';
+            
+            document.getElementById('exerciseModal').classList.add('active');
+        }
+
+        // Close modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Save exercise
+        async function saveExercise() {
+            const id = document.getElementById('exerciseId').value;
+            const data = {
+                name: document.getElementById('exName').value,
+                description: document.getElementById('exDescription').value,
+                category: document.getElementById('exCategory').value,
+                difficultyLevel: document.getElementById('exDifficulty').value,
+                durationMinutes: document.getElementById('exDuration').value ? parseInt(document.getElementById('exDuration').value) : null,
+                caloriesBurnedPerHour: document.getElementById('exCalories').value ? parseInt(document.getElementById('exCalories').value) : null,
+                instructions: document.getElementById('exInstructions').value
+            };
+
+            try {
+                if (id) {
+                    await apiRequest(`/content/exercises/${id}`, {
+                        method: 'PUT',
+                        body: JSON.stringify(data)
+                    });
+                } else {
+                    await apiRequest('/content/exercises', {
+                        method: 'POST',
+                        body: JSON.stringify(data)
+                    });
+                }
+
+                closeModal('exerciseModal');
+                showAlert('Exercise saved successfully', 'success');
+                loadAdminExercises();
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        // Edit exercise
+        async function editExercise(id) {
+            try {
+                const result = await apiRequest(`/content/exercises/${id}`);
+                showExerciseModal(result.data);
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        // Delete exercise
+        async function deleteExercise(id) {
+            if (!confirm('Are you sure you want to delete this exercise?')) return;
+
+            try {
+                await apiRequest(`/content/exercises/${id}`, { method: 'DELETE' });
+                showAlert('Exercise deleted successfully', 'success');
+                loadAdminExercises();
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        // Load admin foods
+        async function loadAdminFoods(page = 1) {
+            const container = document.getElementById('adminFoodsContainer');
+            container.innerHTML = '<div class="text-center"><div class="spinner"></div></div>';
+
+            try {
+                const result = await apiRequest(`/content/foods?page=${page}&limit=10`);
+
+                let html = `
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Calories</th>
+                                    <th>Protein</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                result.data.foods.forEach(food => {
+                    html += `
+                        <tr>
+                            <td>${food.name}</td>
+                            <td>${food.category}</td>
+                            <td>${food.caloriesPer100g}</td>
+                            <td>${food.proteinPer100g}g</td>
+                            <td class="actions">
+                                <button class="btn btn-sm btn-outline" onclick="editFood(${food.id})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteFood(${food.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table></div>';
+                container.innerHTML = html;
+
+            } catch (error) {
+                container.innerHTML = `<p class="text-center text-error">Failed to load foods: ${error.message}</p>`;
+            }
+        }
+
+        // Show food modal
+        function showFoodModal(food = null) {
+            document.getElementById('foodModalTitle').textContent = food ? 'Edit Food' : 'Add Food';
+            document.getElementById('foodId').value = food ? food.id : '';
+            document.getElementById('foodName').value = food ? food.name : '';
+            document.getElementById('foodDescription').value = food ? food.description : '';
+            document.getElementById('foodCategory').value = food ? food.category : '';
+            document.getElementById('foodMealType').value = food ? food.mealType : 'any';
+            document.getElementById('foodCalories').value = food ? food.caloriesPer100g : '';
+            document.getElementById('foodProtein').value = food ? food.proteinPer100g : '';
+            document.getElementById('foodCarbs').value = food ? food.carbsPer100g : '';
+            document.getElementById('foodFat').value = food ? food.fatPer100g : '';
+            document.getElementById('foodFiber').value = food ? food.fiberPer100g : '';
+            
+            document.getElementById('foodModal').classList.add('active');
+        }
+
+        // Save food
+        async function saveFood() {
+            const id = document.getElementById('foodId').value;
+            const data = {
+                name: document.getElementById('foodName').value,
+                description: document.getElementById('foodDescription').value,
+                category: document.getElementById('foodCategory').value,
+                mealType: document.getElementById('foodMealType').value,
+                caloriesPer100g: document.getElementById('foodCalories').value ? parseFloat(document.getElementById('foodCalories').value) : null,
+                proteinPer100g: document.getElementById('foodProtein').value ? parseFloat(document.getElementById('foodProtein').value) : null,
+                carbsPer100g: document.getElementById('foodCarbs').value ? parseFloat(document.getElementById('foodCarbs').value) : null,
+                fatPer100g: document.getElementById('foodFat').value ? parseFloat(document.getElementById('foodFat').value) : null,
+                fiberPer100g: document.getElementById('foodFiber').value ? parseFloat(document.getElementById('foodFiber').value) : null
+            };
+
+            try {
+                if (id) {
+                    await apiRequest(`/content/foods/${id}`, {
+                        method: 'PUT',
+                        body: JSON.stringify(data)
+                    });
+                } else {
+                    await apiRequest('/content/foods', {
+                        method: 'POST',
+                        body: JSON.stringify(data)
+                    });
+                }
+
+                closeModal('foodModal');
+                showAlert('Food saved successfully', 'success');
+                loadAdminFoods();
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        // Edit food
+        async function editFood(id) {
+            try {
+                const result = await apiRequest(`/content/foods/${id}`);
+                showFoodModal(result.data);
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        // Delete food
+        async function deleteFood(id) {
+            if (!confirm('Are you sure you want to delete this food?')) return;
+
+            try {
+                await apiRequest(`/content/foods/${id}`, { method: 'DELETE' });
+                showAlert('Food deleted successfully', 'success');
+                loadAdminFoods();
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        // Load system stats
+        async function loadSystemStats() {
+            const container = document.getElementById('systemStatsContainer');
+            container.innerHTML = '<div class="text-center"><div class="spinner"></div></div>';
+
+            try {
+                const result = await apiRequest('/admin/dashboard-stats');
+                const stats = result.data;
+
+                let html = `
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card">
+                            <h3>Health Metrics</h3>
+                            <div class="value">${stats.healthMetrics.total}</div>
+                            <div class="change">${stats.healthMetrics.uniqueUsers} users</div>
+                        </div>
+                        <div class="dashboard-card">
+                            <h3>Average BMI</h3>
+                            <div class="value">${stats.healthMetrics.averageBMI}</div>
+                            <div class="change">across all users</div>
+                        </div>
+                        <div class="dashboard-card">
+                            <h3>Average TDEE</h3>
+                            <div class="value">${stats.healthMetrics.averageTDEE}</div>
+                            <div class="change">calories/day</div>
+                        </div>
+                    </div>
+
+                    <h4 style="margin: 30px 0 15px;">Recent Activity</h4>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Action</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                stats.recentActivity.slice(0, 10).forEach(activity => {
+                    html += `
+                        <tr>
+                            <td>${activity.user.name} (${activity.user.email})</td>
+                            <td>${activity.action.replace(/_/g, ' ')}</td>
+                            <td>${formatDate(activity.createdAt)}</td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table></div>';
+                container.innerHTML = html;
+
+            } catch (error) {
+                container.innerHTML = `<p class="text-center text-error">Failed to load stats: ${error.message}</p>`;
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboardStats();
+            loadUsers();
+        });
+    </script>
+</body>
+</html>

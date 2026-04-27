@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content - NutriFit</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <i class="fas fa-heartbeat"></i>
+                <span>NutriFit</span>
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="dashboard.html" class="nav-link" id="dashboardLink" style="display: none;">Dashboard</a></li>
+                <li><a href="health.html" class="nav-link" id="healthLink" style="display: none;">Health</a></li>
+                <li><a href="recommendations.html" class="nav-link" id="recsLink" style="display: none;">Recommendations</a></li>
+                <li><a href="content.html" class="nav-link active">Content</a></li>
+                <li><a href="profile.html" class="nav-link" id="profileLink" style="display: none;">Profile</a></li>
+                <li><a href="admin.html" class="nav-link" id="adminLink" style="display: none;">Admin</a></li>
+            </ul>
+            <div class="nav-auth" id="navAuth">
+                <a href="login.html" class="btn btn-outline">Login</a>
+                <a href="register.html" class="btn btn-primary">Register</a>
+            </div>
+            <div class="nav-user" id="navUser" style="display: none;">
+                <span id="userName"></span>
+                <button class="btn btn-outline" onclick="logout()">Logout</button>
+            </div>
+            <button class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Content Page -->
+    <div class="dashboard container">
+        <div class="dashboard-header">
+            <h1><i class="fas fa-book"></i> Fitness & Nutrition Content</h1>
+            <p>Browse our library of exercises and nutrition information</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('exercises')">
+                <i class="fas fa-dumbbell"></i> Exercises
+            </button>
+            <button class="tab" onclick="switchTab('foods')">
+                <i class="fas fa-apple-alt"></i> Nutrition Foods
+            </button>
+        </div>
+
+        <!-- Exercises Tab -->
+        <div id="exercisesTab" class="tab-content active">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Exercise Library</h3>
+                    <div style="display: flex; gap: 10px;">
+                        <select id="exerciseCategory" onchange="loadExercises()">
+                            <option value="">All Categories</option>
+                        </select>
+                        <select id="exerciseDifficulty" onchange="loadExercises()">
+                            <option value="">All Levels</option>
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                        </select>
+                        <input type="text" id="exerciseSearch" placeholder="Search..." onkeyup="debounce(loadExercises, 300)()">
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="exercisesContainer">
+                        <div class="text-center">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                    <div id="exercisesPagination"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Foods Tab -->
+        <div id="foodsTab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Nutrition Database</h3>
+                    <div style="display: flex; gap: 10px;">
+                        <select id="foodCategory" onchange="loadFoods()">
+                            <option value="">All Categories</option>
+                        </select>
+                        <select id="foodMealType" onchange="loadFoods()">
+                            <option value="">All Meal Types</option>
+                            <option value="breakfast">Breakfast</option>
+                            <option value="lunch">Lunch</option>
+                            <option value="dinner">Dinner</option>
+                            <option value="snack">Snack</option>
+                        </select>
+                        <input type="text" id="foodSearch" placeholder="Search..." onkeyup="debounce(loadFoods, 300)()">
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="foodsContainer">
+                        <div class="text-center">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                    <div id="foodsPagination"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer" style="margin-top: 50px;">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 NutriFit. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        // Mobile navigation
+        document.getElementById('navToggle').addEventListener('click', () => {
+            document.getElementById('navMenu').classList.toggle('active');
+        });
+
+        // Check auth status for navigation
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        if (token && user) {
+            document.getElementById('navAuth').style.display = 'none';
+            document.getElementById('navUser').style.display = 'flex';
+            document.getElementById('userName').textContent = `${user.firstName || ''} ${user.lastName || ''}`;
+            document.getElementById('dashboardLink').style.display = 'inline';
+            document.getElementById('healthLink').style.display = 'inline';
+            document.getElementById('recsLink').style.display = 'inline';
+            document.getElementById('profileLink').style.display = 'inline';
+            if (user.role === 'admin') {
+                document.getElementById('adminLink').style.display = 'inline';
+            }
+        }
+
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tab + 'Tab').classList.add('active');
+
+            if (tab === 'exercises') loadExercises();
+            if (tab === 'foods') loadFoods();
+        }
+
+        // Load categories
+        async function loadCategories() {
+            try {
+                const [exerciseCats, foodCats] = await Promise.all([
+                    fetch(`${API_URL}/content/exercises/categories`).then(r => r.json()),
+                    fetch(`${API_URL}/content/foods/categories`).then(r => r.json())
+                ]);
+
+                const exerciseSelect = document.getElementById('exerciseCategory');
+                exerciseCats.data.forEach(cat => {
+                    exerciseSelect.innerHTML += `<option value="${cat}">${cat.charAt(0).toUpperCase() + cat.slice(1)}</option>`;
+                });
+
+                const foodSelect = document.getElementById('foodCategory');
+                foodCats.data.forEach(cat => {
+                    foodSelect.innerHTML += `<option value="${cat}">${cat.charAt(0).toUpperCase() + cat.slice(1)}</option>`;
+                });
+
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        // Load exercises
+        async function loadExercises(page = 1) {
+            const container = document.getElementById('exercisesContainer');
+            
+            if (page === 1) {
+                container.innerHTML = '<div class="text-center"><div class="spinner"></div></div>';
+            }
+
+            const category = document.getElementById('exerciseCategory').value;
+            const difficulty = document.getElementById('exerciseDifficulty').value;
+            const search = document.getElementById('exerciseSearch').value;
+
+            let url = `/content/exercises?page=${page}&limit=9`;
+            if (category) url += `&category=${category}`;
+            if (difficulty) url += `&difficulty=${difficulty}`;
+            if (search) url += `&search=${encodeURIComponent(search)}`;
+
+            try {
+                const result = await apiRequest(url);
+
+                if (result.data.exercises.length === 0) {
+                    container.innerHTML = '<p class="text-center">No exercises found.</p>';
+                    return;
+                }
+
+                let html = '<div class="features-grid">';
+
+                result.data.exercises.forEach(ex => {
+                    const difficultyColor = ex.difficultyLevel === 'beginner' ? 'success' : ex.difficultyLevel === 'intermediate' ? 'warning' : 'danger';
+                    html += `
+                        <div class="feature-card" style="text-align: left;">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                                <h4 style="margin: 0;">${ex.name}</h4>
+                                <span class="badge badge-${difficultyColor}">${ex.difficultyLevel}</span>
+                            </div>
+                            <p style="font-size: 14px; color: var(--text-medium); margin-bottom: 10px;">${ex.description || 'No description available'}</p>
+                            
+                            <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px;">
+                                <span class="badge badge-primary">${ex.category}</span>
+                                ${ex.muscleGroups.slice(0, 3).map(mg => `<span class="badge badge-secondary">${mg}</span>`).join('')}
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 12px; color: var(--text-medium);">
+                                <div><i class="fas fa-clock"></i> ${ex.durationMinutes || '--'} min</div>
+                                <div><i class="fas fa-fire"></i> ${ex.caloriesBurnedPerHour || '--'} cal/hr</div>
+                            </div>
+
+                            ${ex.instructions ? `
+                                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color);">
+                                    <small>${ex.instructions.substring(0, 100)}...</small>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                });
+
+                html += '</div>';
+
+                // Pagination
+                if (result.data.pagination.totalPages > 1) {
+                    html += '<div style="margin-top: 20px;">';
+                    html += createPagination(
+                        result.data.pagination.page,
+                        result.data.pagination.totalPages,
+                        loadExercises
+                    ).outerHTML;
+                    html += '</div>';
+                }
+
+                container.innerHTML = html;
+
+            } catch (error) {
+                container.innerHTML = `<p class="text-center text-error">Failed to load exercises: ${error.message}</p>`;
+            }
+        }
+
+        // Load foods
+        async function loadFoods(page = 1) {
+            const container = document.getElementById('foodsContainer');
+            
+            if (page === 1) {
+                container.innerHTML = '<div class="text-center"><div class="spinner"></div></div>';
+            }
+
+            const category = document.getElementById('foodCategory').value;
+            const mealType = document.getElementById('foodMealType').value;
+            const search = document.getElementById('foodSearch').value;
+
+            let url = `/content/foods?page=${page}&limit=9`;
+            if (category) url += `&category=${category}`;
+            if (mealType) url += `&mealType=${mealType}`;
+            if (search) url += `&search=${encodeURIComponent(search)}`;
+
+            try {
+                const result = await apiRequest(url);
+
+                if (result.data.foods.length === 0) {
+                    container.innerHTML = '<p class="text-center">No foods found.</p>';
+                    return;
+                }
+
+                let html = '<div class="features-grid">';
+
+                result.data.foods.forEach(food => {
+                    html += `
+                        <div class="feature-card" style="text-align: left;">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                                <h4 style="margin: 0;">${food.name}</h4>
+                                <span class="badge badge-success">${food.caloriesPer100g} cal</span>
+                            </div>
+                            <p style="font-size: 14px; color: var(--text-medium); margin-bottom: 10px;">${food.description || ''}</p>
+                            
+                            <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px;">
+                                <span class="badge badge-primary">${food.category}</span>
+                                ${food.dietaryTags.slice(0, 3).map(tag => `<span class="badge badge-secondary">${tag}</span>`).join('')}
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 12px; text-align: center;">
+                                <div style="padding: 8px; background: var(--bg-light); border-radius: var(--radius);">
+                                    <small style="color: var(--text-medium);">Protein</small><br>
+                                    <strong>${food.proteinPer100g}g</strong>
+                                </div>
+                                <div style="padding: 8px; background: var(--bg-light); border-radius: var(--radius);">
+                                    <small style="color: var(--text-medium);">Carbs</small><br>
+                                    <strong>${food.carbsPer100g}g</strong>
+                                </div>
+                                <div style="padding: 8px; background: var(--bg-light); border-radius: var(--radius);">
+                                    <small style="color: var(--text-medium);">Fat</small><br>
+                                    <strong>${food.fatPer100g}g</strong>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += '</div>';
+
+                // Pagination
+                if (result.data.pagination.totalPages > 1) {
+                    html += '<div style="margin-top: 20px;">';
+                    html += createPagination(
+                        result.data.pagination.page,
+                        result.data.pagination.totalPages,
+                        loadFoods
+                    ).outerHTML;
+                    html += '</div>';
+                }
+
+                container.innerHTML = html;
+
+            } catch (error) {
+                container.innerHTML = `<p class="text-center text-error">Failed to load foods: ${error.message}</p>`;
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCategories();
+            loadExercises();
+        });
+    </script>
+</body>
+</html>

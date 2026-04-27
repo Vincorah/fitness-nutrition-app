@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriFit</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <!-- Navigation -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="index.html" class="nav-logo">
+            <i class="fas fa-heartbeat"></i>
+            <span>NutriFit</span>
+        </a>
+
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html" class="nav-link active">Home</a></li>
+            <li><a href="pages/dashboard.html" class="nav-link" id="dashboardLink" style="display: none;">Dashboard</a></li>
+            <li><a href="pages/health.html" class="nav-link" id="healthLink" style="display: none;">Health</a></li>
+            <li><a href="pages/recommendations.html" class="nav-link" id="recsLink" style="display: none;">Recommendations</a></li>
+            <li><a href="pages/content.html" class="nav-link">Content</a></li>
+            <li><a href="pages/admin.html" class="nav-link" id="adminLink" style="display: none;">Admin</a></li>
+        </ul>
+
+        <div class="nav-right">
+            <div class="nav-auth" id="navAuth">
+                <a href="pages/login.html" class="btn btn-outline">Login</a>
+                <a href="pages/register.html" class="btn btn-primary">Register</a>
+            </div>
+
+            <div class="nav-user" id="navUser" style="display: none;">
+                <span id="userName"></span>
+                <button class="btn btn-outline" onclick="logout()">Logout</button>
+            </div>
+
+            <button class="nav-toggle" id="navToggle" type="button" onclick="toggleMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+</nav>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Your Personal Fitness & Nutrition Guide</h1>
+            <p>Get personalized workout plans and nutrition recommendations based on your health metrics and goals.</p>
+            <div class="hero-buttons">
+                <a href="pages/register.html" class="btn btn-primary btn-lg">Get Started</a>
+                <a href="#features" class="btn btn-outline btn-lg">Learn More</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <i class="fas fa-dumbbell"></i>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">What We Offer</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <h3>Health Calculations</h3>
+                    <p>Calculate your BMI, BMR, and TDEE to understand your body's needs.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-dumbbell"></i>
+                    </div>
+                    <h3>Fitness Plans</h3>
+                    <p>Get personalized workout recommendations based on your fitness level and goals.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-apple-alt"></i>
+                    </div>
+                    <h3>Nutrition Guidance</h3>
+                    <p>Receive customized meal plans and nutrition advice for your goals.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Progress Tracking</h3>
+                    <p>Track your health metrics over time and see your progress.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works">
+        <div class="container">
+            <h2 class="section-title">How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Create Account</h3>
+                    <p>Sign up and create your profile with basic information.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Enter Health Data</h3>
+                    <p>Input your weight, height, age, activity level, and goals.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Get Recommendations</h3>
+                    <p>Receive personalized fitness and nutrition recommendations.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Track Progress</h3>
+                    <p>Monitor your improvements and adjust your plan as needed.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalUsers">0</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalExercises">0</div>
+                    <div class="stat-label">Exercises</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalFoods">0</div>
+                    <div class="stat-label">Nutrition Foods</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalRecommendations">0</div>
+                    <div class="stat-label">Recommendations</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <h2>Ready to Start Your Journey?</h2>
+            <p>Join thousands of users who have transformed their health with our personalized recommendations.</p>
+            <a href="pages/register.html" class="btn btn-primary btn-lg">Sign Up Now</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>NutriFit</h3>
+                    <p>Your personal guide to fitness and nutrition.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="pages/content.html">Content</a></li>
+                        <li><a href="pages/login.html">Login</a></li>
+                        <li><a href="pages/register.html">Register</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>Email: support@nutrifit.com</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 NutriFit. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // Load stats on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadPublicStats();
+        });
+
+        async function loadPublicStats() {
+            try {
+                // Get exercises count
+                const exercisesRes = await fetch(`${API_URL}/content/exercises?limit=1`);
+                const exercisesData = await exercisesRes.json();
+                
+                // Get foods count
+                const foodsRes = await fetch(`${API_URL}/content/foods?limit=1`);
+                const foodsData = await foodsRes.json();
+
+                // Update stats (using placeholder values for demo)
+                document.getElementById('totalUsers').textContent = '1,234';
+                document.getElementById('totalExercises').textContent = exercisesData.data?.pagination?.total || '10+';
+                document.getElementById('totalFoods').textContent = foodsData.data?.pagination?.total || '15+';
+                document.getElementById('totalRecommendations').textContent = '5,678';
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+    </script>
+</body>
+</html>

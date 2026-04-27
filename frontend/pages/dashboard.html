@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - NutriFit</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <i class="fas fa-heartbeat"></i>
+                <span>FitNutrition</span>
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="dashboard.html" class="nav-link active">Dashboard</a></li>
+                <li><a href="health.html" class="nav-link">Health</a></li>
+                <li><a href="recommendations.html" class="nav-link">Recommendations</a></li>
+                <li><a href="content.html" class="nav-link">Content</a></li>
+                <li><a href="profile.html" class="nav-link">Profile</a></li>
+                <li><a href="admin.html" class="nav-link" id="adminLink" style="display: none;">Admin</a></li>
+            </ul>
+            <div class="nav-user">
+                <span id="userName"></span>
+                <button class="btn btn-outline" onclick="logout()">Logout</button>
+            </div>
+            <button class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Dashboard -->
+    <div class="dashboard container">
+        <div class="dashboard-header">
+            <h1>Welcome, <span id="welcomeName">User</span>!</h1>
+            <p>Here's your health overview and progress</p>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <!-- No Data Message -->
+        <div id="noDataMessage" class="card" style="display: none;">
+            <div class="card-body text-center">
+                <i class="fas fa-clipboard-list" style="font-size: 48px; color: var(--primary-color); margin-bottom: 20px;"></i>
+                <h3>No Health Data Yet</h3>
+                <p>Start by entering your health information to get personalized recommendations.</p>
+                <a href="health.html" class="btn btn-primary btn-lg" style="margin-top: 15px;">
+                    <i class="fas fa-plus"></i> Add Health Data
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="dashboard-grid" id="statsGrid">
+            <div class="dashboard-card">
+                <h3><i class="fas fa-weight"></i> Current Weight</h3>
+                <div class="value" id="currentWeight">--</div>
+                <div class="change" id="weightChange"></div>
+            </div>
+            <div class="dashboard-card">
+                <h3><i class="fas fa-calculator"></i> BMI</h3>
+                <div class="value" id="bmiValue">--</div>
+                <div class="change" id="bmiCategory"></div>
+            </div>
+            <div class="dashboard-card">
+                <h3><i class="fas fa-fire"></i> BMR</h3>
+                <div class="value" id="bmrValue">--</div>
+                <div class="change">calories/day</div>
+            </div>
+            <div class="dashboard-card">
+                <h3><i class="fas fa-utensils"></i> TDEE</h3>
+                <div class="value" id="tdeeValue">--</div>
+                <div class="change">calories/day</div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
+            <!-- Latest Recommendations -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-lightbulb"></i> Latest Recommendations</h3>
+                    <a href="recommendations.html" class="btn btn-sm btn-outline">View All</a>
+                </div>
+                <div class="card-body" id="recommendationsContainer">
+                    <div class="text-center">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                </div>
+                <div class="card-body">
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                        <a href="health.html" class="btn btn-outline" style="flex-direction: column; padding: 20px;">
+                            <i class="fas fa-plus-circle" style="font-size: 24px; margin-bottom: 8px;"></i>
+                            Add Health Data
+                        </a>
+                        <a href="recommendations.html" class="btn btn-outline" style="flex-direction: column; padding: 20px;">
+                            <i class="fas fa-list" style="font-size: 24px; margin-bottom: 8px;"></i>
+                            View Plans
+                        </a>
+                        <a href="content.html" class="btn btn-outline" style="flex-direction: column; padding: 20px;">
+                            <i class="fas fa-dumbbell" style="font-size: 24px; margin-bottom: 8px;"></i>
+                            Exercises
+                        </a>
+                        <a href="profile.html" class="btn btn-outline" style="flex-direction: column; padding: 20px;">
+                            <i class="fas fa-user" style="font-size: 24px; margin-bottom: 8px;"></i>
+                            Edit Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weight History Chart -->
+        <div class="card" id="weightHistoryCard" style="display: none;">
+            <div class="card-header">
+                <h3><i class="fas fa-chart-line"></i> Weight History</h3>
+            </div>
+            <div class="card-body">
+                <canvas id="weightChart" width="400" height="150"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer" style="margin-top: 50px;">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 NutriFit. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        // Check authentication
+        if (!requireAuth()) {
+            window.location.href = 'login.html';
+        }
+
+        // Mobile navigation
+        document.getElementById('navToggle').addEventListener('click', () => {
+            document.getElementById('navMenu').classList.toggle('active');
+        });
+
+        // Load dashboard data
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = getCurrentUser();
+            document.getElementById('welcomeName').textContent = user.firstName || 'User';
+            document.getElementById('userName').textContent = `${user.firstName || ''} ${user.lastName || ''}`;
+
+            // Show admin link if user is admin
+            if (user.role === 'admin') {
+                document.getElementById('adminLink').style.display = 'inline';
+            }
+
+            await loadDashboardData();
+        });
+
+        async function loadDashboardData() {
+            try {
+                const data = await apiRequest('/health/summary');
+
+                if (!data.data.hasData) {
+                    document.getElementById('noDataMessage').style.display = 'block';
+                    document.getElementById('statsGrid').style.display = 'none';
+                    document.getElementById('recommendationsContainer').innerHTML = 
+                        '<p class="text-center">No recommendations yet. Add your health data first.</p>';
+                    return;
+                }
+
+                const metrics = data.data.latestMetrics;
+
+                // Update stats
+                document.getElementById('currentWeight').textContent = `${formatNumber(metrics.weightKg, 1)} kg`;
+                document.getElementById('bmiValue').textContent = formatNumber(metrics.bmi, 1);
+                document.getElementById('bmiCategory').textContent = getBMICategory(metrics.bmi);
+                document.getElementById('bmrValue').textContent = formatNumber(metrics.bmr, 0);
+                document.getElementById('tdeeValue').textContent = formatNumber(metrics.tdee, 0);
+
+                // Weight trend
+                if (data.data.trend) {
+                    const trendEl = document.getElementById('weightChange');
+                    const trend = data.data.trend;
+                    trendEl.textContent = `${trend.direction === 'increased' ? '+' : ''}${trend.weightChange} kg`;
+                    trendEl.className = `change ${trend.direction === 'decreased' ? 'positive' : trend.direction === 'increased' ? 'negative' : ''}`;
+                }
+
+                // Load recommendations
+                await loadLatestRecommendations();
+
+                // Load weight chart
+                if (data.data.weightHistory.length > 1) {
+                    loadWeightChart(data.data.weightHistory);
+                }
+
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                showAlert('Failed to load dashboard data', 'error');
+            }
+        }
+
+        async function loadLatestRecommendations() {
+            try {
+                const data = await apiRequest('/recommendations/latest');
+                const container = document.getElementById('recommendationsContainer');
+
+                let html = '';
+
+                // Fitness recommendations
+                if (data.data.fitness && data.data.fitness.length > 0) {
+                    html += '<h4 style="margin-bottom: 15px;"><i class="fas fa-dumbbell"></i> Fitness</h4>';
+                    html += '<div style="display: grid; gap: 10px; margin-bottom: 20px;">';
+                    data.data.fitness.slice(0, 2).forEach(rec => {
+                        html += `
+                            <div style="padding: 15px; background: var(--bg-light); border-radius: var(--radius);">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <strong>${rec.title}</strong>
+                                    <span class="badge badge-primary">${rec.type}</span>
+                                </div>
+                                <p style="margin: 8px 0; font-size: 14px; color: var(--text-medium);">${rec.description.substring(0, 100)}...</p>
+                                <small><i class="fas fa-clock"></i> ${rec.duration} | <i class="fas fa-signal"></i> ${rec.intensity}</small>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                }
+
+                // Nutrition recommendation
+                if (data.data.nutrition) {
+                    const nut = data.data.nutrition;
+                    html += '<h4 style="margin-bottom: 15px;"><i class="fas fa-apple-alt"></i> Nutrition</h4>';
+                    html += `
+                        <div style="padding: 15px; background: var(--bg-light); border-radius: var(--radius);">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <strong>${nut.title}</strong>
+                                <span class="badge badge-success">${nut.dailyCalories} cal</span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; text-align: center;">
+                                <div><small>Protein</small><br><strong>${nut.macros.protein}g</strong></div>
+                                <div><small>Carbs</small><br><strong>${nut.macros.carbs}g</strong></div>
+                                <div><small>Fat</small><br><strong>${nut.macros.fat}g</strong></div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (!html) {
+                    html = '<p class="text-center">No recommendations available yet.</p>';
+                }
+
+                container.innerHTML = html;
+
+            } catch (error) {
+                console.error('Error loading recommendations:', error);
+                document.getElementById('recommendationsContainer').innerHTML = 
+                    '<p class="text-center">Failed to load recommendations.</p>';
+            }
+        }
+
+        function getBMICategory(bmi) {
+            if (bmi < 18.5) return 'Underweight';
+            if (bmi < 25) return 'Normal';
+            if (bmi < 30) return 'Overweight';
+            return 'Obese';
+        }
+
+        function loadWeightChart(history) {
+            const card = document.getElementById('weightHistoryCard');
+            card.style.display = 'block';
+
+            const ctx = document.getElementById('weightChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: history.map(h => formatDate(h.date)),
+                    datasets: [{
+                        label: 'Weight (kg)',
+                        data: history.map(h => h.weight),
+                        borderColor: '#4CAF50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

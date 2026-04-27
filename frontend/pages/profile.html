@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - FitNutrition</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <i class="fas fa-heartbeat"></i>
+                <span>NutriFit</span>
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                <li><a href="health.html" class="nav-link">Health</a></li>
+                <li><a href="recommendations.html" class="nav-link">Recommendations</a></li>
+                <li><a href="content.html" class="nav-link">Content</a></li>
+                <li><a href="profile.html" class="nav-link active">Profile</a></li>
+                <li><a href="admin.html" class="nav-link" id="adminLink" style="display: none;">Admin</a></li>
+            </ul>
+            <div class="nav-user">
+                <span id="userName"></span>
+                <button class="btn btn-outline" onclick="logout()">Logout</button>
+            </div>
+            <button class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Profile Page -->
+    <div class="dashboard container">
+        <div class="dashboard-header">
+            <h1><i class="fas fa-user"></i> My Profile</h1>
+            <p>Manage your account and personal information</p>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
+            <!-- Profile Information -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-id-card"></i> Profile Information</h3>
+                </div>
+                <div class="card-body">
+                    <form id="profileForm">
+                        <div class="form-group">
+                            <label for="profileFirstName">First Name</label>
+                            <input type="text" id="profileFirstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profileLastName">Last Name</label>
+                            <input type="text" id="profileLastName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profileEmail">Email</label>
+                            <input type="email" id="profileEmail" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="profilePhone">Phone</label>
+                            <input type="tel" id="profilePhone" placeholder="Enter phone number">
+                        </div>
+                        <div class="form-group">
+                            <label for="profileBio">Bio</label>
+                            <textarea id="profileBio" rows="3" placeholder="Tell us about yourself"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Additional Details -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-info-circle"></i> Additional Details</h3>
+                </div>
+                <div class="card-body">
+                    <form id="detailsForm">
+                        <div class="form-group">
+                            <label for="profileDob">Date of Birth</label>
+                            <input type="date" id="profileDob">
+                        </div>
+                        <div class="form-group">
+                            <label for="profileSex">Sex</label>
+                            <select id="profileSex">
+                                <option value="">Select...</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="profileHeight">Height (cm)</label>
+                            <input type="number" id="profileHeight" step="0.1" min="50" max="300" placeholder="e.g., 175">
+                        </div>
+                        <div class="form-group">
+                            <label for="profileTargetWeight">Target Weight (kg)</label>
+                            <input type="number" id="profileTargetWeight" step="0.1" min="20" max="500" placeholder="e.g., 70">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="form-group">
+                                <label for="profileCity">City</label>
+                                <input type="text" id="profileCity" placeholder="Your city">
+                            </div>
+                            <div class="form-group">
+                                <label for="profileCountry">Country</label>
+                                <input type="text" id="profileCountry" placeholder="Your country">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
+                            <i class="fas fa-save"></i> Save Details
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Change Password -->
+        <div class="card" style="margin-top: 20px;">
+            <div class="card-header">
+                <h3><i class="fas fa-lock"></i> Change Password</h3>
+            </div>
+            <div class="card-body">
+                <form id="passwordForm" style="max-width: 400px;">
+                    <div class="form-group">
+                        <label for="currentPassword">Current Password</label>
+                        <input type="password" id="currentPassword" required placeholder="Enter current password">
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" id="newPassword" required placeholder="Enter new password">
+                        <small>Must be at least 8 characters with uppercase, lowercase, and number</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmNewPassword">Confirm New Password</label>
+                        <input type="password" id="confirmNewPassword" required placeholder="Confirm new password">
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-key"></i> Change Password
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Account Actions -->
+        <div class="card" style="margin-top: 20px;">
+            <div class="card-header">
+                <h3><i class="fas fa-cog"></i> Account Actions</h3>
+            </div>
+            <div class="card-body">
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <a href="dashboard.html" class="btn btn-outline">
+                        <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+                    </a>
+                    <a href="health.html" class="btn btn-outline">
+                        <i class="fas fa-heartbeat"></i> Manage Health Data
+                    </a>
+                    <button class="btn btn-danger" onclick="deleteAccount()">
+                        <i class="fas fa-trash"></i> Delete Account
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer" style="margin-top: 50px;">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 NutriFit. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        // Check authentication
+        if (!requireAuth()) {
+            window.location.href = 'login.html';
+        }
+
+        // Mobile navigation
+        document.getElementById('navToggle').addEventListener('click', () => {
+            document.getElementById('navMenu').classList.toggle('active');
+        });
+
+        // Set user name
+        const user = getCurrentUser();
+        document.getElementById('userName').textContent = `${user.firstName || ''} ${user.lastName || ''}`;
+        if (user.role === 'admin') {
+            document.getElementById('adminLink').style.display = 'inline';
+        }
+
+        // Load profile data
+        async function loadProfile() {
+            try {
+                const result = await apiRequest('/auth/me');
+                const data = result.data;
+
+                // Basic info
+                document.getElementById('profileFirstName').value = data.firstName || '';
+                document.getElementById('profileLastName').value = data.lastName || '';
+                document.getElementById('profileEmail').value = data.email || '';
+                document.getElementById('profilePhone').value = data.profile?.phone || '';
+                document.getElementById('profileBio').value = data.profile?.bio || '';
+
+                // Additional details
+                document.getElementById('profileDob').value = data.profile?.dateOfBirth ? data.profile.dateOfBirth.split('T')[0] : '';
+                document.getElementById('profileSex').value = data.profile?.sex || '';
+                document.getElementById('profileHeight').value = data.profile?.heightCm || '';
+                document.getElementById('profileTargetWeight').value = data.profile?.targetWeightKg || '';
+                document.getElementById('profileCity').value = data.profile?.city || '';
+                document.getElementById('profileCountry').value = data.profile?.country || '';
+
+            } catch (error) {
+                showAlert('Failed to load profile: ' + error.message, 'error');
+            }
+        }
+
+        // Profile form submission
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearAlert();
+
+            const data = {
+                firstName: document.getElementById('profileFirstName').value,
+                lastName: document.getElementById('profileLastName').value,
+                phone: document.getElementById('profilePhone').value,
+                bio: document.getElementById('profileBio').value
+            };
+
+            try {
+                await apiRequest('/users/info', {
+                    method: 'PUT',
+                    body: JSON.stringify({ firstName: data.firstName, lastName: data.lastName })
+                });
+
+                await apiRequest('/users/profile', {
+                    method: 'PUT',
+                    body: JSON.stringify({ phone: data.phone, bio: data.bio })
+                });
+
+                // Update local user data
+                updateUserData({ firstName: data.firstName, lastName: data.lastName });
+                document.getElementById('userName').textContent = `${data.firstName} ${data.lastName}`;
+
+                showAlert('Profile updated successfully!', 'success');
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        });
+
+        // Details form submission
+        document.getElementById('detailsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearAlert();
+
+            const data = {
+                dateOfBirth: document.getElementById('profileDob').value,
+                sex: document.getElementById('profileSex').value,
+                heightCm: document.getElementById('profileHeight').value ? parseFloat(document.getElementById('profileHeight').value) : null,
+                targetWeightKg: document.getElementById('profileTargetWeight').value ? parseFloat(document.getElementById('profileTargetWeight').value) : null,
+                city: document.getElementById('profileCity').value,
+                country: document.getElementById('profileCountry').value
+            };
+
+            try {
+                await apiRequest('/users/profile', {
+                    method: 'PUT',
+                    body: JSON.stringify(data)
+                });
+
+                showAlert('Details updated successfully!', 'success');
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        });
+
+        // Password form submission
+        document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearAlert();
+
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+            if (newPassword !== confirmNewPassword) {
+                showAlert('New passwords do not match', 'error');
+                return;
+            }
+
+            if (newPassword.length < 8) {
+                showAlert('Password must be at least 8 characters', 'error');
+                return;
+            }
+
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/;
+            if (!passwordRegex.test(newPassword)) {
+                showAlert('Password must contain uppercase, lowercase, and number', 'error');
+                return;
+            }
+
+            try {
+                await apiRequest('/auth/change-password', {
+                    method: 'POST',
+                    body: JSON.stringify({ currentPassword, newPassword })
+                });
+
+                showAlert('Password changed successfully!', 'success');
+                document.getElementById('passwordForm').reset();
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        });
+
+        // Delete account
+        async function deleteAccount() {
+            if (!confirm('WARNING: This will permanently delete your account and all data. Are you sure?')) return;
+
+            const password = prompt('Please enter your password to confirm:');
+            if (!password) return;
+
+            try {
+                await apiRequest('/users/account', {
+                    method: 'DELETE',
+                    body: JSON.stringify({ password })
+                });
+
+                logout();
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        // Load profile on page load
+        loadProfile();
+    </script>
+</body>
+</html>

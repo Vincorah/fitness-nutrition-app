@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recommendations - NutriFit</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <i class="fas fa-heartbeat"></i>
+                <span>NutriFit</span>
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                <li><a href="health.html" class="nav-link">Health</a></li>
+                <li><a href="recommendations.html" class="nav-link active">Recommendations</a></li>
+                <li><a href="content.html" class="nav-link">Content</a></li>
+                <li><a href="profile.html" class="nav-link">Profile</a></li>
+                <li><a href="admin.html" class="nav-link" id="adminLink" style="display: none;">Admin</a></li>
+            </ul>
+            <div class="nav-user">
+                <span id="userName"></span>
+                <button class="btn btn-outline" onclick="logout()">Logout</button>
+            </div>
+            <button class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Recommendations Page -->
+    <div class="dashboard container">
+        <div class="dashboard-header">
+            <h1><i class="fas fa-lightbulb"></i> Your Recommendations</h1>
+            <p>Personalized fitness and nutrition plans based on your health data</p>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('fitness')">
+                <i class="fas fa-dumbbell"></i> Fitness
+            </button>
+            <button class="tab" onclick="switchTab('nutrition')">
+                <i class="fas fa-apple-alt"></i> Nutrition
+            </button>
+            <button class="tab" onclick="switchTab('stats')">
+                <i class="fas fa-chart-bar"></i> Stats
+            </button>
+        </div>
+
+        <!-- Fitness Tab -->
+        <div id="fitnessTab" class="tab-content active">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Fitness Recommendations</h3>
+                </div>
+                <div class="card-body" id="fitnessContainer">
+                    <div class="text-center">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nutrition Tab -->
+        <div id="nutritionTab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Nutrition Recommendations</h3>
+                </div>
+                <div class="card-body" id="nutritionContainer">
+                    <div class="text-center">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Tab -->
+        <div id="statsTab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Recommendation Statistics</h3>
+                </div>
+                <div class="card-body" id="statsContainer">
+                    <div class="text-center">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer" style="margin-top: 50px;">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 NutriFit. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        // Check authentication
+        if (!requireAuth()) {
+            window.location.href = 'login.html';
+        }
+
+        // Mobile navigation
+        document.getElementById('navToggle').addEventListener('click', () => {
+            document.getElementById('navMenu').classList.toggle('active');
+        });
+
+        // Set user name
+        const user = getCurrentUser();
+        document.getElementById('userName').textContent = `${user.firstName || ''} ${user.lastName || ''}`;
+        if (user.role === 'admin') {
+            document.getElementById('adminLink').style.display = 'inline';
+        }
+
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tab + 'Tab').classList.add('active');
+
+            if (tab === 'fitness') loadFitnessRecommendations();
+            if (tab === 'nutrition') loadNutritionRecommendations();
+            if (tab === 'stats') loadStats();
+        }
+
+        // Load fitness recommendations
+        async function loadFitnessRecommendations(page = 1) {
+            const container = document.getElementById('fitnessContainer');
+            
+            if (page === 1) {
+                container.innerHTML = '<div class="text-center"><div class="spinner"></div></div>';
+            }
+
+            try {
+                const result = await apiRequest(`/recommendations/fitness?page=${page}&limit=5`);
+
+                if (result.data.recommendations.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center">
+                            <i class="fas fa-clipboard-list" style="font-size: 48px; color: var(--primary-color); margin-bottom: 20px;"></i>
+                            <h3>No Fitness Recommendations Yet</h3>
+                            <p>Add your health data to get personalized fitness recommendations.</p>
+                            <a href="health.html" class="btn btn-primary" style="margin-top: 15px;">
+                                <i class="fas fa-plus"></i> Add Health Data
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '<div style="display: grid; gap: 20px;">';
+
+                result.data.recommendations.forEach(rec => {
+                    html += `
+                        <div class="card" style="margin-bottom: 0;">
+                            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <h4 style="margin: 0;">${rec.title}</h4>
+                                    <small style="color: var(--text-medium);">
+                                        <i class="fas fa-calendar"></i> ${formatDate(rec.createdAt)}
+                                    </small>
+                                </div>
+                                <div>
+                                    <span class="badge badge-primary">${rec.type}</span>
+                                    ${rec.isCompleted ? '<span class="badge badge-success"><i class="fas fa-check"></i> Done</span>' : ''}
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <p>${rec.description}</p>
+                                
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 20px 0; padding: 15px; background: var(--bg-light); border-radius: var(--radius);">
+                                    <div>
+                                        <small style="color: var(--text-medium);">Frequency</small><br>
+                                        <strong><i class="fas fa-redo"></i> ${rec.frequency}</strong>
+                                    </div>
+                                    <div>
+                                        <small style="color: var(--text-medium);">Duration</small><br>
+                                        <strong><i class="fas fa-clock"></i> ${rec.duration}</strong>
+                                    </div>
+                                    <div>
+                                        <small style="color: var(--text-medium);">Intensity</small><br>
+                                        <strong><i class="fas fa-signal"></i> ${rec.intensity}</strong>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <strong>Exercises:</strong>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+                                        ${rec.exercises.map(ex => `<span class="badge badge-primary">${ex}</span>`).join('')}
+                                    </div>
+                                </div>
+
+                                ${!rec.isCompleted ? `
+                                    <button class="btn btn-success" style="margin-top: 15px;" onclick="markFitnessComplete(${rec.id})">
+                                        <i class="fas fa-check"></i> Mark as Complete
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += '</div>';
+
+                // Pagination
+                if (result.data.pagination.totalPages > 1) {
+                    html += '<div style="margin-top: 20px;">'; 
+                    html += createPagination(
+                        result.data.pagination.page,
+                        result.data.pagination.totalPages,
+                        loadFitnessRecommendations
+                    ).outerHTML;
+                    html += '</div>';
+                }
+
+                container.innerHTML = html;
+
+            } catch (error) {
+                container.innerHTML = `<p class="text-center text-error">Failed to load recommendations: ${error.message}</p>`;
+            }
+        }
+
+        // Load nutrition recommendations
+        async function loadNutritionRecommendations(page = 1) {
+            const container = document.getElementById('nutritionContainer');
+            
+            if (page === 1) {
+                container.innerHTML = '<div class="text-center"><div class="spinner"></div></div>';
+            }
+
+            try {
+                const result = await apiRequest(`/recommendations/nutrition?page=${page}&limit=5`);
+
+                if (result.data.recommendations.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center">
+                            <i class="fas fa-clipboard-list" style="font-size: 48px; color: var(--primary-color); margin-bottom: 20px;"></i>
+                            <h3>No Nutrition Recommendations Yet</h3>
+                            <p>Add your health data to get personalized nutrition recommendations.</p>
+                            <a href="health.html" class="btn btn-primary" style="margin-top: 15px;">
+                                <i class="fas fa-plus"></i> Add Health Data
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '<div style="display: grid; gap: 20px;">';
+
+                result.data.recommendations.forEach(rec => {
+                    html += `
+                        <div class="card" style="margin-bottom: 0;">
+                            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <h4 style="margin: 0;">${rec.title}</h4>
+                                    <small style="color: var(--text-medium);">
+                                        <i class="fas fa-calendar"></i> ${formatDate(rec.createdAt)}
+                                    </small>
+                                </div>
+                                <div>
+                                    <span class="badge badge-success">${rec.dailyCalories} cal</span>
+                                    ${rec.isCompleted ? '<span class="badge badge-success"><i class="fas fa-check"></i> Done</span>' : ''}
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <p>${rec.description}</p>
+                                
+                                <h5 style="margin: 20px 0 10px;">Daily Macros</h5>
+                                <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr);">
+                                    <div class="dashboard-card" style="padding: 15px;">
+                                        <h3 style="font-size: 12px;">Protein</h3>
+                                        <div class="value" style="font-size: 24px;">${rec.macros.protein}g</div>
+                                    </div>
+                                    <div class="dashboard-card" style="padding: 15px;">
+                                        <h3 style="font-size: 12px;">Carbs</h3>
+                                        <div class="value" style="font-size: 24px;">${rec.macros.carbs}g</div>
+                                    </div>
+                                    <div class="dashboard-card" style="padding: 15px;">
+                                        <h3 style="font-size: 12px;">Fat</h3>
+                                        <div class="value" style="font-size: 24px;">${rec.macros.fat}g</div>
+                                    </div>
+                                    <div class="dashboard-card" style="padding: 15px;">
+                                        <h3 style="font-size: 12px;">Fiber</h3>
+                                        <div class="value" style="font-size: 24px;">${rec.macros.fiber}g</div>
+                                    </div>
+                                </div>
+
+                                <h5 style="margin: 20px 0 10px;">Meal Distribution</h5>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px;">
+                                    ${Object.entries(rec.mealSuggestions).map(([meal, calories]) => `
+                                        <div style="padding: 10px; background: var(--bg-light); border-radius: var(--radius); text-align: center;">
+                                            <small style="text-transform: capitalize;">${meal}</small><br>
+                                            <strong>${calories} cal</strong>
+                                        </div>
+                                    `).join('')}
+                                </div>
+
+                                ${rec.dietaryRestrictions.length > 0 ? `
+                                    <div style="margin-top: 15px;">
+                                        <strong>Foods to Limit:</strong>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+                                            ${rec.dietaryRestrictions.map(food => `<span class="badge badge-warning">${food}</span>`).join('')}
+                                        </div>
+                                    </div>
+                                ` : ''}
+
+                                ${!rec.isCompleted ? `
+                                    <button class="btn btn-success" style="margin-top: 15px;" onclick="markNutritionComplete(${rec.id})">
+                                        <i class="fas fa-check"></i> Mark as Complete
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += '</div>';
+
+                // Pagination
+                if (result.data.pagination.totalPages > 1) {
+                    html += '<div style="margin-top: 20px;">';
+                    html += createPagination(
+                        result.data.pagination.page,
+                        result.data.pagination.totalPages,
+                        loadNutritionRecommendations
+                    ).outerHTML;
+                    html += '</div>';
+                }
+
+                container.innerHTML = html;
+
+            } catch (error) {
+                container.innerHTML = `<p class="text-center text-error">Failed to load recommendations: ${error.message}</p>`;
+            }
+        }
+
+        // Load stats
+        async function loadStats() {
+            const container = document.getElementById('statsContainer');
+            container.innerHTML = '<div class="text-center"><div class="spinner"></div></div>';
+
+            try {
+                const result = await apiRequest('/recommendations/stats');
+                const stats = result.data;
+
+                let html = `
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card">
+                            <h3><i class="fas fa-dumbbell"></i> Fitness Recommendations</h3>
+                            <div class="value">${stats.fitness.total}</div>
+                            <div class="change">
+                                ${stats.fitness.completed} completed (${stats.fitness.completionRate}%)
+                            </div>
+                        </div>
+                        <div class="dashboard-card">
+                            <h3><i class="fas fa-apple-alt"></i> Nutrition Recommendations</h3>
+                            <div class="value">${stats.nutrition.total}</div>
+                            <div class="change">
+                                ${stats.nutrition.completed} completed (${stats.nutrition.completionRate}%)
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                if (stats.recentActivity.length > 0) {
+                    html += `
+                        <h4 style="margin: 30px 0 15px;"><i class="fas fa-history"></i> Recent Activity</h4>
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Action</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+
+                    stats.recentActivity.forEach(activity => {
+                        html += `
+                            <tr>
+                                <td>${activity.action.replace(/_/g, ' ')}</td>
+                                <td>${formatDate(activity.createdAt)}</td>
+                            </tr>
+                        `;
+                    });
+
+                    html += '</tbody></table></div>';
+                }
+
+                container.innerHTML = html;
+
+            } catch (error) {
+                container.innerHTML = `<p class="text-center text-error">Failed to load stats: ${error.message}</p>`;
+            }
+        }
+
+        // Mark fitness as complete
+        async function markFitnessComplete(id) {
+            try {
+                await apiRequest(`/recommendations/fitness/${id}/complete`, { method: 'PATCH' });
+                showAlert('Marked as complete!', 'success');
+                loadFitnessRecommendations();
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        // Mark nutrition as complete
+        async function markNutritionComplete(id) {
+            try {
+                await apiRequest(`/recommendations/nutrition/${id}/complete`, { method: 'PATCH' });
+                showAlert('Marked as complete!', 'success');
+                loadNutritionRecommendations();
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        // Load initial data
+        loadFitnessRecommendations();
+    </script>
+</body>
+</html>
