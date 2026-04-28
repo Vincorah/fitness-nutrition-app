@@ -24,7 +24,7 @@ const dbConfig = {
 // Enable SSL for production (required by cloud MySQL providers like Aiven, Railway, PlanetScale)
 if (process.env.NODE_ENV === 'production' || process.env.DB_SSL === 'true') {
   dbConfig.ssl = {
-    rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== 'false',
+    rejectUnauthorized: false, // Set to false to allow self-signed certificates from cloud providers like Aiven
   };
 }
 
