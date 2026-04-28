@@ -108,6 +108,18 @@ app.get('/', (req, res) => {
   });
 });
 
+// Database setup endpoint (temporary)
+app.get('/api/setup-db', async (req, res) => {
+  try {
+    const setupDatabase = require('./setupDb');
+    await setupDatabase();
+    res.json({ success: true, message: 'Database schema successfully initialized!' });
+  } catch (error) {
+    console.error('Setup DB Error:', error);
+    res.status(500).json({ success: false, message: 'Failed to setup database', error: error.message });
+  }
+});
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({

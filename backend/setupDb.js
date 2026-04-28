@@ -34,11 +34,11 @@ async function setupDatabase() {
     
     console.log("✅ Database schema and sample data successfully imported!");
     await connection.end();
-    process.exit(0);
+    return true;
   } catch (error) {
     console.error("❌ Error setting up database:", error);
-    process.exit(1);
+    throw error;
   }
 }
 
-setupDatabase();
+module.exports = setupDatabase;
