@@ -21,6 +21,13 @@ const dbConfig = {
   multipleStatements: false,
 };
 
+// Enable SSL for production (required by cloud MySQL providers like Aiven, Railway, PlanetScale)
+if (process.env.NODE_ENV === 'production' || process.env.DB_SSL === 'true') {
+  dbConfig.ssl = {
+    rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== 'false',
+  };
+}
+
 // Create connection pool
 const pool = mysql.createPool(dbConfig);
 

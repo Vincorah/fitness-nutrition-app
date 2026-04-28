@@ -120,11 +120,24 @@ app.use((req, res) => {
 app.use(errorHandler);
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔗 API URL: http://localhost:${PORT}`);
-});
+const startServer = async () => {
+  // Test database connection
+  const { testConnection } = require('./config/database');
+  const dbConnected = await testConnection();
+  
+  if (!dbConnected) {
+    console.error('⚠️ Server starting without database connection. Some features may not work.');
+  }
+
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🔗 API URL: http://localhost:${PORT}`);
+    console.log(`💾 Database: ${dbConnected ? 'Connected' : 'Not connected'}`);
+  });
+};
+
+startServer();
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (err) => {

@@ -4,7 +4,11 @@
  */
 
 // API Configuration
-const API_URL = 'http://localhost:3000/api';
+// Replace 'YOUR_RENDER_BACKEND_URL' with your actual Render deployment URL after deploying
+// Example: 'https://fitness-nutrition-backend.onrender.com/api'
+const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:3000/api'
+    : 'YOUR_RENDER_BACKEND_URL/api';
 
 // DOM Ready
 document.addEventListener('DOMContentLoaded', () => {
