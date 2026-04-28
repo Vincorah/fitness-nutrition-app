@@ -20,19 +20,23 @@ async function setupDatabase() {
 
     console.log("Successfully connected. Reading schema.sql...");
     
-    // Read the schema.sql file
-    const schemaPath = path.join(__dirname, '../database/schema.sql');
-    let sql = fs.readFileSync(schemaPath, 'utf8');
-
-    // Remove the CREATE DATABASE and USE statements as Aiven handles DB creation
-    sql = sql.replace(/CREATE DATABASE IF NOT EXISTS fitness_nutrition_db[^;]+;/g, '');
-    sql = sql.replace(/USE fitness_nutrition_db;/g, '');
-
-    console.log("Executing schema. This might take a few seconds...");
+    console.log("Updating users table with reset_token columns...");
     
-    await connection.query(sql);
+    try {
+      await connection.query('ALTER TABLE users ADD COLUMN reset_token VARCHAR(255) NULL');
+      console.log("Added reset_token column.");
+    } catch (e) {
+      console.log("reset_token column might already exist:", e.message);
+    }
+
+    try {
+      await connection.query('ALTER TABLE users ADD COLUMN reset_expires DATETIME NULL');
+      console.log("Added reset_expires column.");
+    } catch (e) {
+      console.log("reset_expires column might already exist:", e.message);
+    }
     
-    console.log("✅ Database schema and sample data successfully imported!");
+    console.log("✅ Database schema successfully updated!");
     await connection.end();
     return true;
   } catch (error) {
