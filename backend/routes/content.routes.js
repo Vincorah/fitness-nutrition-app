@@ -48,8 +48,8 @@ router.get('/exercises', paginationValidator, asyncHandler(async (req, res) => {
      FROM exercises
      ${whereClause}
      ORDER BY category, name
-     LIMIT ? OFFSET ?`,
-    [...params, limit, offset]
+     LIMIT ${limit} OFFSET ${offset}`,
+    params
   );
 
   const countResult = await query(
@@ -311,8 +311,8 @@ router.get('/foods', paginationValidator, asyncHandler(async (req, res) => {
      FROM nutrition_foods
      ${whereClause}
      ORDER BY category, name
-     LIMIT ? OFFSET ?`,
-    [...params, limit, offset]
+     LIMIT ${limit} OFFSET ${offset}`,
+    params
   );
 
   const countResult = await query(
