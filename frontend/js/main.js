@@ -8,7 +8,7 @@
 // Example: 'https://fitness-nutrition-backend.onrender.com/api'
 const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:3000/api'
-    : 'YOUR_RENDER_BACKEND_URL/api';
+    : 'https://fitness-nutrition-app-5g9g.onrender.com/api';
 
 // DOM Ready
 document.addEventListener('DOMContentLoaded', () => {
