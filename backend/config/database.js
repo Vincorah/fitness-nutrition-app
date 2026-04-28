@@ -47,7 +47,10 @@ const testConnection = async () => {
 // Query helper with error handling
 const query = async (sql, params = []) => {
   try {
-    const [results] = await pool.execute(sql, params);
+    // Use pool.query instead of pool.execute to use the text protocol.
+    // This fixes issues with LIMIT/OFFSET parameters and prevents auto-parsing of JSON columns
+    // so our existing JSON.parse() calls work correctly.
+    const [results] = await pool.query(sql, params);
     return results;
   } catch (error) {
     console.error('Database query error:', error);
