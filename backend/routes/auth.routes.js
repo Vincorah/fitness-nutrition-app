@@ -24,7 +24,7 @@ const transporter = nodemailer.createTransport({
 
 // Forgot Password
 router.post('/forgot-password', asyncHandler(async (req, res) => {
-  const { email } = req.body;
+  const { email, currentUrl } = req.body;
 
   const users = await query(
     'SELECT id, email FROM users WHERE email = ?',
@@ -48,9 +48,11 @@ router.post('/forgot-password', asyncHandler(async (req, res) => {
     [token, expires, user.id]
   );
 
-  // Generate the reset link dynamically based on where the request came from
-  const referer = req.headers.referer || 'http://localhost:3000/pages/forgot-password.html';
-  const baseUrl = referer.split('?')[0]; // Remove any existing query parameters
+  // Use the exact URL the user is currently on (sent from frontend)
+  // Fallback to origin if currentUrl is missing for some reason
+  const origin = req.headers.origin || 'http://localhost:5500';
+  let baseUrl = currentUrl ? currentUrl.split('?')[0] : `${origin}/frontend/pages/forgot-password.html`;
+  
   const resetLink = `${baseUrl.replace('forgot-password.html', 'reset-password.html')}?token=${token}`;
 
   await transporter.sendMail({
