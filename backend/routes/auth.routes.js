@@ -48,7 +48,10 @@ router.post('/forgot-password', asyncHandler(async (req, res) => {
     [token, expires, user.id]
   );
 
-  const resetLink = `http://127.0.0.1:5500/fitness-nutrition-app/frontend/pages/reset-password.html?token=${token}`;
+  // Generate the reset link dynamically based on where the request came from
+  const referer = req.headers.referer || 'http://localhost:3000/pages/forgot-password.html';
+  const baseUrl = referer.split('?')[0]; // Remove any existing query parameters
+  const resetLink = `${baseUrl.replace('forgot-password.html', 'reset-password.html')}?token=${token}`;
 
   await transporter.sendMail({
     from: '"NutriFit" <yourprojectemail@gmail.com>',
