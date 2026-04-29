@@ -242,18 +242,22 @@
 
                 html += '</div>';
 
-                // Pagination
-                if (result.data.pagination.totalPages > 1) {
-                    html += '<div style="margin-top: 20px;">';
-                    html += createPagination(
-                        result.data.pagination.page,
-                        result.data.pagination.totalPages,
-                        loadExercises
-                    ).outerHTML;
-                    html += '</div>';
-                }
-
                 container.innerHTML = html;
+
+                // Pagination
+                const paginationContainer = document.getElementById('exercisesPagination');
+                if (paginationContainer) {
+                    paginationContainer.innerHTML = '';
+                    if (result.data.pagination.totalPages > 1) {
+                        paginationContainer.appendChild(
+                            createPagination(
+                                result.data.pagination.page,
+                                result.data.pagination.totalPages,
+                                loadExercises
+                            )
+                        );
+                    }
+                }
 
             } catch (error) {
                 container.innerHTML = `<p class="text-center text-error">Failed to load exercises: ${error.message}</p>`;
@@ -321,18 +325,22 @@
 
                 html += '</div>';
 
-                // Pagination
-                if (result.data.pagination.totalPages > 1) {
-                    html += '<div style="margin-top: 20px;">';
-                    html += createPagination(
-                        result.data.pagination.page,
-                        result.data.pagination.totalPages,
-                        loadFoods
-                    ).outerHTML;
-                    html += '</div>';
-                }
-
                 container.innerHTML = html;
+
+                // Pagination
+                const paginationContainer = document.getElementById('foodsPagination');
+                if (paginationContainer) {
+                    paginationContainer.innerHTML = '';
+                    if (result.data.pagination.totalPages > 1) {
+                        paginationContainer.appendChild(
+                            createPagination(
+                                result.data.pagination.page,
+                                result.data.pagination.totalPages,
+                                loadFoods
+                            )
+                        );
+                    }
+                }
 
             } catch (error) {
                 container.innerHTML = `<p class="text-center text-error">Failed to load foods: ${error.message}</p>`;
