@@ -67,8 +67,8 @@ router.get('/exercises', paginationValidator, asyncHandler(async (req, res) => {
         description: e.description,
         category: e.category,
         difficultyLevel: e.difficulty_level,
-        muscleGroups: JSON.parse(e.muscle_groups || '[]'),
-        equipmentNeeded: JSON.parse(e.equipment_needed || '[]'),
+        muscleGroups: typeof e.muscle_groups === 'string' ? JSON.parse(e.muscle_groups) : (e.muscle_groups || []),
+        equipmentNeeded: typeof e.equipment_needed === 'string' ? JSON.parse(e.equipment_needed) : (e.equipment_needed || []),
         durationMinutes: e.duration_minutes,
         caloriesBurnedPerHour: e.calories_burned_per_hour,
         instructions: e.instructions,
@@ -127,8 +127,8 @@ router.get('/exercises/:id', idParamValidator, asyncHandler(async (req, res) => 
       description: e.description,
       category: e.category,
       difficultyLevel: e.difficulty_level,
-      muscleGroups: JSON.parse(e.muscle_groups || '[]'),
-      equipmentNeeded: JSON.parse(e.equipment_needed || '[]'),
+      muscleGroups: typeof e.muscle_groups === 'string' ? JSON.parse(e.muscle_groups) : (e.muscle_groups || []),
+      equipmentNeeded: typeof e.equipment_needed === 'string' ? JSON.parse(e.equipment_needed) : (e.equipment_needed || []),
       durationMinutes: e.duration_minutes,
       caloriesBurnedPerHour: e.calories_burned_per_hour,
       instructions: e.instructions,
@@ -335,7 +335,7 @@ router.get('/foods', paginationValidator, asyncHandler(async (req, res) => {
         fatPer100g: f.fat_per_100g,
         fiberPer100g: f.fiber_per_100g,
         servingSizeG: f.serving_size_g,
-        dietaryTags: JSON.parse(f.dietary_tags || '[]'),
+        dietaryTags: typeof f.dietary_tags === 'string' ? JSON.parse(f.dietary_tags) : (f.dietary_tags || []),
         mealType: f.meal_type
       })),
       pagination: {
@@ -395,7 +395,7 @@ router.get('/foods/:id', idParamValidator, asyncHandler(async (req, res) => {
       fatPer100g: f.fat_per_100g,
       fiberPer100g: f.fiber_per_100g,
       servingSizeG: f.serving_size_g,
-      dietaryTags: JSON.parse(f.dietary_tags || '[]'),
+      dietaryTags: typeof f.dietary_tags === 'string' ? JSON.parse(f.dietary_tags) : (f.dietary_tags || []),
       mealType: f.meal_type
     }
   });
