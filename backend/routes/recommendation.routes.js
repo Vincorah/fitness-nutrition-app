@@ -45,7 +45,7 @@ router.get('/fitness', authenticateToken, paginationValidator, asyncHandler(asyn
         type: r.recommendation_type,
         title: r.title,
         description: r.description,
-        exercises: JSON.parse(r.exercises || '[]'),
+        exercises: typeof r.exercises === 'string' ? JSON.parse(r.exercises || '[]') : (r.exercises || []),
         frequency: r.frequency,
         duration: r.duration,
         intensity: r.intensity,
@@ -108,8 +108,8 @@ router.get('/nutrition', authenticateToken, paginationValidator, asyncHandler(as
           fat: r.fat_g,
           fiber: r.fiber_g
         },
-        mealSuggestions: JSON.parse(r.meal_suggestions || '{}'),
-        dietaryRestrictions: JSON.parse(r.dietary_restrictions || '[]'),
+        mealSuggestions: typeof r.meal_suggestions === 'string' ? JSON.parse(r.meal_suggestions || '{}') : (r.meal_suggestions || {}),
+        dietaryRestrictions: typeof r.dietary_restrictions === 'string' ? JSON.parse(r.dietary_restrictions || '[]') : (r.dietary_restrictions || []),
         isCompleted: r.is_completed,
         createdAt: r.created_at,
         basedOn: {
@@ -162,7 +162,7 @@ router.get('/latest', authenticateToken, asyncHandler(async (req, res) => {
         type: r.recommendation_type,
         title: r.title,
         description: r.description,
-        exercises: JSON.parse(r.exercises || '[]'),
+        exercises: typeof r.exercises === 'string' ? JSON.parse(r.exercises || '[]') : (r.exercises || []),
         frequency: r.frequency,
         duration: r.duration,
         intensity: r.intensity,
@@ -181,8 +181,8 @@ router.get('/latest', authenticateToken, asyncHandler(async (req, res) => {
           fat: nutritionRecs[0].fat_g,
           fiber: nutritionRecs[0].fiber_g
         },
-        mealSuggestions: JSON.parse(nutritionRecs[0].meal_suggestions || '{}'),
-        dietaryRestrictions: JSON.parse(nutritionRecs[0].dietary_restrictions || '[]'),
+        mealSuggestions: typeof nutritionRecs[0].meal_suggestions === 'string' ? JSON.parse(nutritionRecs[0].meal_suggestions || '{}') : (nutritionRecs[0].meal_suggestions || {}),
+        dietaryRestrictions: typeof nutritionRecs[0].dietary_restrictions === 'string' ? JSON.parse(nutritionRecs[0].dietary_restrictions || '[]') : (nutritionRecs[0].dietary_restrictions || []),
         isCompleted: nutritionRecs[0].is_completed,
         createdAt: nutritionRecs[0].created_at
       } : null
@@ -218,7 +218,7 @@ router.get('/fitness/:id', authenticateToken, asyncHandler(async (req, res) => {
       type: r.recommendation_type,
       title: r.title,
       description: r.description,
-      exercises: JSON.parse(r.exercises || '[]'),
+      exercises: typeof r.exercises === 'string' ? JSON.parse(r.exercises || '[]') : (r.exercises || []),
       frequency: r.frequency,
       duration: r.duration,
       intensity: r.intensity,
@@ -269,8 +269,8 @@ router.get('/nutrition/:id', authenticateToken, asyncHandler(async (req, res) =>
         fat: r.fat_g,
         fiber: r.fiber_g
       },
-      mealSuggestions: JSON.parse(r.meal_suggestions || '{}'),
-      dietaryRestrictions: JSON.parse(r.dietary_restrictions || '[]'),
+      mealSuggestions: typeof r.meal_suggestions === 'string' ? JSON.parse(r.meal_suggestions || '{}') : (r.meal_suggestions || {}),
+      dietaryRestrictions: typeof r.dietary_restrictions === 'string' ? JSON.parse(r.dietary_restrictions || '[]') : (r.dietary_restrictions || []),
       isCompleted: r.is_completed,
       createdAt: r.created_at,
       basedOn: {
