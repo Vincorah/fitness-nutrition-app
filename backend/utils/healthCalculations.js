@@ -142,7 +142,7 @@ const generateFitnessRecommendations = (data) => {
 
   // Cardio recommendations
   const cardioRec = {
-    type: 'cardio',
+    type: 'exercise',
     title: 'Cardiovascular Exercise',
     description: getCardioDescription(goal, activityLevel),
     frequency: getCardioFrequency(goal),
@@ -154,7 +154,7 @@ const generateFitnessRecommendations = (data) => {
 
   // Strength training recommendations
   const strengthRec = {
-    type: 'strength',
+    type: 'exercise',
     title: 'Strength Training',
     description: getStrengthDescription(goal, bmiCategory),
     frequency: getStrengthFrequency(goal),
@@ -166,7 +166,7 @@ const generateFitnessRecommendations = (data) => {
 
   // Flexibility recommendations
   const flexibilityRec = {
-    type: 'flexibility',
+    type: 'exercise',
     title: 'Flexibility & Recovery',
     description: 'Improve mobility and prevent injuries with regular stretching.',
     frequency: 'Daily',
@@ -179,7 +179,7 @@ const generateFitnessRecommendations = (data) => {
   // Goal-specific recommendations
   if (goal === 'build_muscle') {
     recommendations.push({
-      type: 'strength',
+      type: 'workout_plan',
       title: 'Progressive Overload',
       description: 'Gradually increase weights or reps to stimulate muscle growth.',
       frequency: 'Every workout',
